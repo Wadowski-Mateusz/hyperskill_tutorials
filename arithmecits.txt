@@ -1,0 +1,72 @@
+import kotlin.Exception        
+
+// Forgive me for what I coded
+
+fun calculateBrakingDistance(v1: String, a: String, v2: String = "0"): Int {
+    return try {
+        val v1AsInt: Int = v1.toInt()
+        val v2AsInt: Int = v2.toInt()
+        val aAsInt: Int = a.toInt()
+
+        divideByTwo(division(pow(v2AsInt, 2) - pow(v1AsInt, 2), aAsInt))
+        
+    } catch (e: ArithmeticException) { // for a == 0
+        println("The car does not slow down!")
+        -1
+    } catch (e: Exception) {
+        println(e.message)
+        -1
+    }
+}
+
+// binary shift to right, with correction for negative values
+fun divideByTwo(a: Int): Int = if (a < 0) (a + 1) shr 1 else a shr 1 
+
+// works for every int excluding Int.MIN_VALUE (duh)
+fun oppositeNumber(x: Int) = x.inv() + 1 // inv() - bits negation
+
+fun division(divident: Int, divisor: Int): Int {
+    if (divisor == 0) throw ArithmeticException()
+    var quotient = 0
+    
+    val dividentNegative: Boolean = divident < 0
+    val divisorNegative: Boolean = divisor < 0
+    
+    if (dividentNegative && divisorNegative) { // both negative
+        while (multiplication(divisor, quotient + 1) >= divident) {
+            quotient++
+        }
+    } else if (!dividentNegative && !divisorNegative) { // both non-negative
+        while (multiplication(divisor, quotient + 1) <= divident) {
+            quotient++
+        }
+    } else if (dividentNegative) {
+        while (multiplication(divisor, quotient - 1) >= divident) {
+            quotient--
+        }
+    } else /*if (divisorNegative) */ { 
+        while (multiplication(divisor, quotient - 1) <= divident) {
+            quotient--
+        }
+    }
+    return quotient
+}
+
+fun multiplication(coefficient: Int, times: Int): Int {
+    when {
+        times < 0 -> return multiplication(oppositeNumber(coefficient), oppositeNumber(times))
+        times == 1 -> return coefficient
+        times == 0 -> return 0
+        else -> return coefficient + multiplication(coefficient, times - 1)
+    }
+}
+
+fun pow(base: Int, power: Int): Int {
+    when (power) {
+        1 -> return base
+        0 -> return 1
+        else -> return multiplication(base, pow(base, power - 1))
+    }
+}
+
+// Yes, that idea was a mistake
