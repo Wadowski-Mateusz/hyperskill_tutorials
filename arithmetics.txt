@@ -1,5 +1,6 @@
 import kotlin.Exception        
 
+
 fun calculateBrakingDistance(v1: String, a: String, v2: String = "0"): Int {
     return try {
         val v1AsInt: Int = v1.toInt()
