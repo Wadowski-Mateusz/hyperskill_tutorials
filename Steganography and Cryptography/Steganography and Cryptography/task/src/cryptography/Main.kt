@@ -7,20 +7,55 @@ import javax.imageio.ImageIO
 
 fun main() {
 
-    hide()
-
-//    while(true) {
-//        println("Task (hide, show, exit):")
-//        val choice: String = readln().trim()
-//        when (choice) {
-//            "hide" -> hide()
-//            "show" -> show()
-//            "exit" -> break
-//            else -> println("Wrong task: $choice")
-//        }
-//    }
-//    println("Bye!")
+    while(true) {
+        println("Task (hide, show, exit):")
+        val choice: String = readln().trim()
+        when (choice) {
+            "hide" -> hide()
+            "show" -> show()
+            "exit" -> break
+            else -> println("Wrong task: $choice")
+        }
+    }
+    println("Bye!")
 }
+
+fun show() {
+    println("Input image file:")
+    val inputFilename: String = readln().trim()
+
+    val bufferedImage = try {
+        ImageIO.read(File(inputFilename))
+    } catch (e: IOException) {
+        println("Can't read input file!")
+        return
+    }
+    val endingSequence = "0 0 3".split(" ").map { it.toByte() }
+    val endingSequenceAsBits = buildString {
+        endingSequence.map { append(it.toString(2).padStart(8, '0'))}
+    }
+
+    val encodedMessage = buildString {
+        loop@for (h in 0 until bufferedImage.height) {
+            for (w in 0 until bufferedImage.width) {
+                val color = Color(bufferedImage.getRGB(w, h))
+                append(if (decodeBitFromBlue(color)) '1' else '0')
+                if (indexOf(endingSequenceAsBits) > -1) {
+                    break@loop
+                }
+            }
+        }
+    }
+
+    val message = encodedMessage.substring(0, encodedMessage.length - 24)
+        .chunked(8)
+        .map{ it.toByte(2) }
+        .toByteArray()
+        .toString(Charsets.UTF_8)
+    println("Message: $message")
+}
+
+
 
 fun hide() {
     println("Input image file:")
@@ -59,13 +94,12 @@ fun hide() {
         }
     }
 
-    // TODO switch i with j in indexes?
     try {
-        for (i in 0 until bufferedImage.width) {
-            for (j in 0 until bufferedImage.height) {
-                val color = Color(bufferedImage.getRGB(i, j))
-                val encodedColor = encodeBitInBlueValue(color, messageAsBitArray[i * bufferedImage.height + j])
-                bufferedImage.setRGB(i, j, encodedColor.rgb)
+        for (h in 0 until bufferedImage.height) {
+            for (w in 0 until bufferedImage.width) {
+                val color = Color(bufferedImage.getRGB(w, h))
+                val encodedColor = encodeBitInBlueValue(color, messageAsBitArray[h * bufferedImage.width + w])
+                bufferedImage.setRGB(w, h, encodedColor.rgb)
             }
         }
     } catch (e: IndexOutOfBoundsException) { // end of message before reaching EOF
@@ -80,6 +114,8 @@ fun hide() {
         println("Can't write to output file!")
         return
     }
+
+
     println("Message saved in $outputFilename image.")
 }
 
@@ -109,7 +145,7 @@ fun encodeBitInBlueValue(color: Color, bit: Boolean): Color =
     else
         Color(color.red, color.green, color.blue and 254) // changes last bits to 0
 
-fun show() {
-    println("Obtaining message from image.")
-    // toString(Charsets.UTF_8) - restore message from bytes to UTF-8
-}
+
+// change the least significant bit to the most significant
+// if value is negative, this bit is 1, otherwise it is 0
+fun decodeBitFromBlue(color: Color): Boolean = color.blue.rotateRight(1) < 0
