@@ -6,17 +6,20 @@ import java.io.IOException
 import javax.imageio.ImageIO
 
 fun main() {
-    while(true) {
-        println("Task (hide, show, exit):")
-        val choice: String = readln().trim()
-        when (choice) {
-            "hide" -> hide()
-            "show" -> show()
-            "exit" -> break
-            else -> println("Wrong task: $choice")
-        }
-    }
-    println("Bye!")
+
+    hide()
+
+//    while(true) {
+//        println("Task (hide, show, exit):")
+//        val choice: String = readln().trim()
+//        when (choice) {
+//            "hide" -> hide()
+//            "show" -> show()
+//            "exit" -> break
+//            else -> println("Wrong task: $choice")
+//        }
+//    }
+//    println("Bye!")
 }
 
 fun hide() {
@@ -26,8 +29,10 @@ fun hide() {
     println("Output image file:")
     val outputFilename: String = readln().trim()
 
-    println("Input Image: $inputFilename\n" +
-            "Output Image: $outputFilename")
+    println("Message to hide:")
+    val message: String = readln().trim()
+    val messageAsByteArray: ByteArray = message.encodeToByteArray()
+    val endingSequence = "0 0 3".split(" ").map { it.toByte() }
 
     val bufferedImage = try {
         ImageIO.read(File(inputFilename))
@@ -36,12 +41,35 @@ fun hide() {
         return
     }
 
-    for (i in 0 until bufferedImage.width) {
-        for (j in 0 until bufferedImage.height) {
-            val color = Color(bufferedImage.getRGB(i, j))
-            val encodedColor = encodeColor(color, true)
-            bufferedImage.setRGB(i, j, encodedColor.rgb)
+    if (bufferedImage.width * bufferedImage.height < (messageAsByteArray.size + 3) * 8 ) { // +3 for code STOP; *8 byte -> bit
+        println("The input image is not large enough to hold this message.")
+        return
+    }
+
+    val messageAsBitArray = buildList<Boolean> {
+        // add message
+        for (byte: Byte in messageAsByteArray) {
+            for (bit: Char in byte.toString(2).padStart(8, '0'))
+                add(bit == '1')
         }
+        // add ending sequence
+        for (byte in endingSequence) {
+            for (bit: Char in byte.toString(2).padStart(8, '0'))
+                add(bit == '1')
+        }
+    }
+
+    // TODO switch i with j in indexes?
+    try {
+        for (i in 0 until bufferedImage.width) {
+            for (j in 0 until bufferedImage.height) {
+                val color = Color(bufferedImage.getRGB(i, j))
+                val encodedColor = encodeBitInBlueValue(color, messageAsBitArray[i * bufferedImage.height + j])
+                bufferedImage.setRGB(i, j, encodedColor.rgb)
+            }
+        }
+    } catch (e: IndexOutOfBoundsException) { // end of message before reaching EOF
+        // pass
     }
 
     try {
@@ -49,10 +77,10 @@ fun hide() {
         val fileExtension: String = outputFilename.split(".").last()
         ImageIO.write(bufferedImage, fileExtension, outputFile)
     } catch (e: IOException) {
-        println("Can't read input file!")
+        println("Can't write to output file!")
         return
     }
-    println("Image $outputFilename is saved.")
+    println("Message saved in $outputFilename image.")
 }
 
 /**
@@ -63,11 +91,25 @@ fun hide() {
  * @return modified Color
  * */
 fun encodeColor(color: Color, bit: Boolean): Color =
-    if(bit)
+    if (bit)
         Color(color.red or 1, color.green or 1, color.blue or 1) // changes last bits to 1
     else
-        Color(color.red and 254, color.green or 254, color.blue or 254) // changes last bits to 0
+        Color(color.red and 254, color.green and 254, color.blue and 254) // changes last bits to 0
+
+/**
+ * Return sent Color with the least significant bit of blue changed to 0 or 1
+ *
+ *  @param color Color to encode bit
+ *  @bit it `true` change to 1; else change to 0
+ *  @return Color with encoded bit
+ */
+fun encodeBitInBlueValue(color: Color, bit: Boolean): Color =
+    if (bit)
+        Color(color.red, color.green, color.blue or 1) // changes last bits to 1
+    else
+        Color(color.red, color.green, color.blue and 254) // changes last bits to 0
 
 fun show() {
     println("Obtaining message from image.")
+    // toString(Charsets.UTF_8) - restore message from bytes to UTF-8
 }
