@@ -1,16 +1,20 @@
 package encryptdecrypt
 
 fun main() {
-    val msg = "we found a treasure!".lowercase()
-//    val msg = "abcdefghijklmnopqrstuvwxyz!".lowercase()
+    val msg = readln().lowercase()
+    val key = readln().toInt()
+//    val msg = "welcode to hyperskill"
+//    val key = 5
+
     val encMsg = buildString {
         for (char in msg) {
             if (char in 'a'..'z')
-                append( ('z'.code - char.code + 'a'.code).toChar() )
+                append( ((char.code - 'a'.code + key) % 26 + 'a'.code).toChar()  )
             else
                 append(char)
         }
     }
 
     println(encMsg)
+
 }
