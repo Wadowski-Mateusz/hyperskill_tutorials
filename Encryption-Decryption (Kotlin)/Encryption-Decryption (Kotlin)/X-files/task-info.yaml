@@ -2,12 +2,46 @@ type: edu
 files:
 - name: src/Main.kt
   visible: true
-  text: |-
+  text: |
     package encryptdecrypt
 
-    fun main() {
-        println("Hello World!")
+    fun main(args: Array<String>) {
+        var mode: String = "dec"
+        var data: String = ""
+        var key: Int = 0
+
+        if (args.isNotEmpty()) {
+            if (args.indexOf("-mode") != -1)
+                mode = args[args.indexOf("-mode") + 1]
+            if (args.indexOf("-key") != -1)
+                key = args[args.indexOf("-key") + 1].toInt()
+            if (args.indexOf("-data") != -1)
+                data = args[args.indexOf("-data") + 1]
+        }
+
+        val output: String = when (mode) {
+            "enc" -> encryption(data, key)
+            "dec" -> decryption(data, key)
+            else -> "No such a command!"
+        }
+        println(output)
     }
+
+    fun encryption(message: String, key: Int): String =
+        buildString { message.map { append((it.code + key).toChar()) } }
+
+    fun decryption(ciphertext: String, key: Int): String =
+        buildString { ciphertext.map { append((it.code - key).toChar()) } }
+
+    //  // encryption
+    //    val encMsg = buildString {
+    //        for (char in msg) {
+    //            if (char in 'a'..'z')
+    //                append( ((char.code - 'a'.code + key) % 26 + 'a'.code).toChar()  )
+    //            else
+    //                append((char.code).toChar())
+    //        }
+    //    }
   learner_created: false
 - name: test/EncryptDecryptTest.java
   visible: false
@@ -114,6 +148,12 @@ files:
         }
     }
   learner_created: false
-feedback_link: https://hyperskill.org/learn/step/21970#comment
-status: Unchecked
+- name: output.txt
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/projects/279/stages/1419/implement#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Fri, 07 Apr 2023 20:22:54 UTC"
 record: -1

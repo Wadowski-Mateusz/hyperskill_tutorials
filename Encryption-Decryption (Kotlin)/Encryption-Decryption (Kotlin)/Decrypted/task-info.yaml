@@ -6,7 +6,22 @@ files:
     package encryptdecrypt
 
     fun main() {
-        println("Hello World!")
+        val msg = readln().lowercase()
+        val key = readln().toInt()
+    //    val msg = "welcode to hyperskill"
+    //    val key = 5
+
+        val encMsg = buildString {
+            for (char in msg) {
+                if (char in 'a'..'z')
+                    append( ((char.code - 'a'.code + key) % 26 + 'a'.code).toChar()  )
+                else
+                    append(char)
+            }
+        }
+
+        println(encMsg)
+
     }
   learner_created: false
 - name: test/EncryptDecryptTest.java
@@ -56,9 +71,6 @@ files:
         }
     }
   learner_created: false
-feedback_link: https://hyperskill.org/learn/step/21968#comment
+feedback_link: https://hyperskill.org/projects/279/stages/1417/implement#comment
 status: Solved
-feedback:
-  message: Congratulations!
-  time: "Fri, 07 Apr 2023 18:03:23 UTC"
-record: 3
+record: 2
