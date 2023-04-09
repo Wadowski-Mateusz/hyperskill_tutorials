@@ -1,41 +1,114 @@
 package watermark
 
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.File
+import java.lang.NumberFormatException
 import javax.imageio.ImageIO
+import kotlin.system.exitProcess
+
+
+class Image(val fileName: String, val name: String) {
+    val imageFile: File = File(fileName)
+    val bufferedImage: BufferedImage
+    val width: Int
+    val height: Int
+    val numberOfComponents: Int
+    val numberOfColorComponents: Int
+    val bitsPerPixel: Int
+    val transparency: Int
+
+    init {
+        if(!imageFile.isFile) {
+            println("The file $fileName doesn't exist.")
+            exitProcess(1)
+        }
+        bufferedImage= ImageIO.read(imageFile)
+        width = bufferedImage.width
+        height = bufferedImage.height
+        numberOfComponents = bufferedImage.colorModel.numComponents
+        numberOfColorComponents = bufferedImage.colorModel.numColorComponents
+        bitsPerPixel = bufferedImage.colorModel.pixelSize
+        transparency = bufferedImage.transparency
+        validateImage()
+    }
+
+    fun getTransparencyName(): String = when(this.transparency) {
+            1 -> "OPAQUE"
+            2 -> "BITMASK"
+            3 -> "TRANSLUCENT"
+            else -> {"ILLEGAL TRANSPARENCY ID"}
+    }
+
+    private fun validateImage() {
+        if (numberOfColorComponents != 3) {
+            println("The number of $name color components isn't 3.")
+            exitProcess(1)
+        }
+        if (bitsPerPixel != 24 && bitsPerPixel != 32) {
+            println("The $name isn't 24 or 32-bit.")
+            exitProcess(1)
+        }
+    }
+}
 
 
 fun main() {
+
     println("Input the image filename:")
-    val imageName: String = readln()
-    val imageFile: File = File(imageName)
+    val sourceImageName: String = readln()
+    val sourceImage = Image(sourceImageName, "image")
 
-    if(!imageFile.isFile) {
-        println("The file $imageName doesn't exist.")
-        return
+    println("Input the watermark image filename:")
+    val watermarkFileName: String = readln()
+    val watermarkImage = Image(watermarkFileName, "watermark")
+
+    val width: Int = sourceImage.width
+    val height: Int = sourceImage.height
+    if (width != watermarkImage.width || height != watermarkImage.height){
+        println("The image and watermark dimensions are different.")
+        exitProcess(1)
     }
 
-    val image: BufferedImage = ImageIO.read(imageFile)
+    println("Input the watermark transparency percentage (Integer 0-100):")
+    val watermarkTransparencyPercentage: Int =
+        try {
+            val transparency = readln().toInt()
+            if (transparency !in 0..100) {
+                println("The transparency percentage is out of range.")
+                exitProcess(1)
+            }
+            transparency
+        } catch (e: NumberFormatException) {
+            println("The transparency percentage isn't an integer number.")
+            exitProcess(1)
+        }
 
-
-    val width: Int = image.width
-    val height: Int = image.height
-    val numberOfComponents: Int = image.colorModel.numComponents
-    val numberOfColorComponents: Int = image.colorModel.numColorComponents
-    val bitsPerPixel: Int = image.colorModel.pixelSize
-    val transparency: Int = image.transparency
-
-
-    println("Image file: $imageName")
-    println("Width: $width")
-    println("Height: $height")
-    println("Number of components: $numberOfComponents")
-    println("Number of color components: $numberOfColorComponents")
-    println("Bits per pixel: $bitsPerPixel")
-//    print("Transparency: ")
-    when(transparency) {
-        1 -> println("Transparency: OPAQUE")
-        2 -> println("Transparency: BITMASK")
-        3 -> println("Transparency: TRANSLUCENT")
+    println("Input the output image filename (jpg or png extension):")
+    val outputFileName: String = readln()
+    if (outputFileName.split(".").last() != "jpg" && outputFileName.split(".").last() != "png") {
+        println("The output file extension isn't \"jpg\" or \"png\".")
+        exitProcess(1)
     }
+
+    val outputImage = Image(sourceImageName, "output")
+
+    for (wIndex in 1..width) {
+        for (hIndex in 1..height) {
+            val sourceColor = Color(sourceImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1))
+            val watermarkColor = Color(watermarkImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1))
+            val outputColor: Color = calculateOutputColor(sourceColor, watermarkColor, watermarkTransparencyPercentage)
+            outputImage.bufferedImage.setRGB(wIndex - 1, hIndex -1, outputColor.rgb)
+        }
+    }
+
+    ImageIO.write(outputImage.bufferedImage, outputFileName.split(".").last(), File(outputFileName))
+    println("The watermarked image $outputFileName has been created.")
 }
+
+fun calculateOutputColor(sourceColor: Color, watermarkColor: Color, weight: Int): Color =
+    Color(
+        (weight * watermarkColor.red + (100 - weight) * sourceColor.red) / 100,
+        (weight * watermarkColor.green + (100 - weight) * sourceColor.green) / 100,
+        (weight * watermarkColor.blue + (100 - weight) * sourceColor.blue) / 100
+    )
