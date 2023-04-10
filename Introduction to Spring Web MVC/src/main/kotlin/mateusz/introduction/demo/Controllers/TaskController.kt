@@ -1,4 +1,4 @@
-package mateusz.introduction.demo.Controlers
+package mateusz.introduction.demo.Controllers
 
 import mateusz.introduction.demo.Task
 import org.springframework.http.HttpStatus
