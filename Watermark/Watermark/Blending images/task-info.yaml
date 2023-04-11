@@ -529,4 +529,7 @@ files:
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/17146#comment
 status: Solved
-record: 1
+feedback:
+  message: Congratulations!
+  time: "Sun, 09 Apr 2023 21:00:40 UTC"
+record: 2

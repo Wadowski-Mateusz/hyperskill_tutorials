@@ -49,4 +49,5 @@ class Image(val fileName: String, val name: String) {
             exitProcess(1)
         }
     }
+
 }

@@ -16,10 +16,8 @@ fun main() {
     val watermarkFileName: String = readln().trim()
     val watermarkImage = Image(watermarkFileName, "watermark")
 
-    val width: Int = sourceImage.width
-    val height: Int = sourceImage.height
-    if (width != watermarkImage.width || height != watermarkImage.height){
-        println("The image and watermark dimensions are different.")
+    if (sourceImage.width < watermarkImage.width || sourceImage.height < watermarkImage.height){
+        println("The watermark's dimensions are larger.")
         exitProcess(1)
     }
 
@@ -54,7 +52,7 @@ fun main() {
 
 
     println("Input the watermark transparency percentage (Integer 0-100):")
-    val watermarkTransparencyPercentage: Int =
+    val transparencyPercentage: Int =
         try {
             val transparency = readln().trim().toInt()
             if (transparency !in 0..100) {
@@ -67,6 +65,38 @@ fun main() {
             exitProcess(1)
         }
 
+    println("Choose the position method (single, grid):")
+    val typeOfWatermark = readln().trim()
+    if (typeOfWatermark != "single" && typeOfWatermark != "grid") {
+        println("The position method input is invalid.")
+        exitProcess(1)
+    }
+
+     val (xStart: Int, yStart: Int) =
+         if (typeOfWatermark == "single") {
+             val diffX: Int = sourceImage.width - watermarkImage.width
+             val diffY: Int = sourceImage.height - watermarkImage.height
+             println("Input the watermark position ([x 0-$diffX] [y 0-$diffY]):")
+             val position: List<Int> = try {
+                 val position = readln().split(" ").map { it.toInt() }
+                 if (position.size != 2) {
+                     println("Wrong number of dimensions.") // own
+                     exitProcess(1)
+                 }
+                 position
+             } catch (e: java.lang.NumberFormatException) {
+                 println("The position input is invalid.")
+                 exitProcess(1)
+             }
+             if (position[0] !in 0..diffX || position[1] !in 0..diffY) {
+                 println("The position input is out of range.")
+                 exitProcess(1)
+             }
+             position
+         } else {
+             listOf(0,0)
+         }
+
     println("Input the output image filename (jpg or png extension):")
     val outputFileName: String = readln().trim()
     if (outputFileName.split(".").last() != "jpg" && outputFileName.split(".").last() != "png") {
@@ -74,17 +104,61 @@ fun main() {
         exitProcess(1)
     }
 
-    val outputImage = Image(sourceImageName, "output")
+    val outputImage: Image =
+        if (typeOfWatermark == "grid")
+            gridWatermark(sourceImage, watermarkImage, transparencyPercentage, functionForColorCalculation)
+        else  // typeOfWatermark == "single"
+            singleWatermark(sourceImage, watermarkImage, xStart, yStart, transparencyPercentage, functionForColorCalculation)
 
-    for (wIndex in 1..width) {
-        for (hIndex in 1..height) {
-            val sourceColor = Color(sourceImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1))
-            val watermarkColor = Color(watermarkImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1),true)
-            val outputColor: Color = functionForColorCalculation(sourceColor, watermarkColor, watermarkTransparencyPercentage)
-            outputImage.bufferedImage.setRGB(wIndex - 1, hIndex -1, outputColor.rgb)
-        }
-    }
 
     ImageIO.write(outputImage.bufferedImage, outputFileName.split(".").last(), File(outputFileName))
     println("The watermarked image $outputFileName has been created.")
+}
+
+fun singleWatermark(sourceImage: Image, watermarkImage: Image, xStart: Int, yStart: Int,
+                    transparencyPercentage: Int, calculationFunction: (Color, Color, Int) -> Color): Image {
+
+    val outputImage = Image(sourceImage.fileName, "output")
+    var xWatermark = 0
+    var yWatermark = 0
+
+    for (xIndex in xStart until xStart + watermarkImage.width) {
+        for (yIndex in yStart until yStart + watermarkImage.height) {
+            val sourceColor = Color(sourceImage.bufferedImage
+                .getRGB(xIndex, yIndex))
+            val watermarkColor = Color(watermarkImage.bufferedImage
+                .getRGB(xWatermark, yWatermark),true)
+            val outputColor: Color = calculationFunction(sourceColor, watermarkColor, transparencyPercentage)
+            outputImage.bufferedImage.setRGB(xIndex, yIndex, outputColor.rgb)
+            yWatermark++
+        }
+        yWatermark = 0
+        xWatermark++
+    }
+
+    return outputImage
+}
+
+fun gridWatermark(sourceImage: Image, watermarkImage: Image,
+                  transparencyPercentage: Int, calculationFunction: (Color, Color, Int) -> Color): Image {
+
+    val outputImage = Image(sourceImage.fileName, "output")
+
+    var xWatermark = 0
+    var yWatermark = 0
+    for (columnIndex in 0 until sourceImage.width) {
+        for (rowIndex in 0 until sourceImage.height) {
+            val sourceColor = Color(sourceImage.bufferedImage.getRGB(columnIndex, rowIndex))
+            val watermarkColor = Color(
+                watermarkImage.bufferedImage
+                    .getRGB(xWatermark, yWatermark), true)
+            val outputColor: Color = calculationFunction(sourceColor, watermarkColor, transparencyPercentage)
+            outputImage.bufferedImage.setRGB(columnIndex, rowIndex, outputColor.rgb)
+            yWatermark = (1 + yWatermark) % watermarkImage.height
+        }
+        yWatermark = 0
+        xWatermark = (1 + xWatermark) % watermarkImage.width
+    }
+
+    return outputImage
 }

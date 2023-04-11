@@ -576,6 +576,21 @@ files:
 
 
   learner_created: false
+- name: test/out4.png
+  visible: true
+  learner_created: true
+- name: test/image4.png
+  visible: true
+  learner_created: true
+- name: src/watermark/Image.kt
+  visible: true
+  learner_created: true
+- name: src/watermark/ColorCalculator.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/17147#comment
 status: Solved
-record: 2
+feedback:
+  message: Congratulations!
+  time: "Tue, 11 Apr 2023 09:36:07 UTC"
+record: 4
