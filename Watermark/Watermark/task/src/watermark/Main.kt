@@ -40,6 +40,8 @@ class Image(val fileName: String, val name: String) {
             else -> {"ILLEGAL TRANSPARENCY ID"}
     }
 
+    fun isTransparent(): Boolean = transparency == 3
+
     private fun validateImage() {
         if (numberOfColorComponents != 3) {
             println("The number of $name color components isn't 3.")
@@ -56,11 +58,11 @@ class Image(val fileName: String, val name: String) {
 fun main() {
 
     println("Input the image filename:")
-    val sourceImageName: String = readln()
+    val sourceImageName: String = readln().trim()
     val sourceImage = Image(sourceImageName, "image")
 
     println("Input the watermark image filename:")
-    val watermarkFileName: String = readln()
+    val watermarkFileName: String = readln().trim()
     val watermarkImage = Image(watermarkFileName, "watermark")
 
     val width: Int = sourceImage.width
@@ -70,10 +72,21 @@ fun main() {
         exitProcess(1)
     }
 
+    val functionForColorCalculation: (Color, Color, Int) -> Color =
+        if(watermarkImage.isTransparent()) {
+            println("Do you want to use the watermark's Alpha channel?")
+            if (readln().trim().lowercase() == "yes")
+               :: calculateOutputColorTransparent
+            else
+                ::calculateOutputColor
+        } else
+            ::calculateOutputColor
+
+
     println("Input the watermark transparency percentage (Integer 0-100):")
     val watermarkTransparencyPercentage: Int =
         try {
-            val transparency = readln().toInt()
+            val transparency = readln().trim().toInt()
             if (transparency !in 0..100) {
                 println("The transparency percentage is out of range.")
                 exitProcess(1)
@@ -85,7 +98,7 @@ fun main() {
         }
 
     println("Input the output image filename (jpg or png extension):")
-    val outputFileName: String = readln()
+    val outputFileName: String = readln().trim()
     if (outputFileName.split(".").last() != "jpg" && outputFileName.split(".").last() != "png") {
         println("The output file extension isn't \"jpg\" or \"png\".")
         exitProcess(1)
@@ -96,11 +109,13 @@ fun main() {
     for (wIndex in 1..width) {
         for (hIndex in 1..height) {
             val sourceColor = Color(sourceImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1))
-            val watermarkColor = Color(watermarkImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1))
-            val outputColor: Color = calculateOutputColor(sourceColor, watermarkColor, watermarkTransparencyPercentage)
+            val watermarkColor = Color(watermarkImage.bufferedImage.getRGB(wIndex - 1, hIndex - 1),true)
+            val outputColor: Color = functionForColorCalculation(sourceColor, watermarkColor, watermarkTransparencyPercentage)
             outputImage.bufferedImage.setRGB(wIndex - 1, hIndex -1, outputColor.rgb)
         }
     }
+
+
 
     ImageIO.write(outputImage.bufferedImage, outputFileName.split(".").last(), File(outputFileName))
     println("The watermarked image $outputFileName has been created.")
@@ -112,3 +127,14 @@ fun calculateOutputColor(sourceColor: Color, watermarkColor: Color, weight: Int)
         (weight * watermarkColor.green + (100 - weight) * sourceColor.green) / 100,
         (weight * watermarkColor.blue + (100 - weight) * sourceColor.blue) / 100
     )
+
+fun calculateOutputColorTransparent(sourceColor: Color, watermarkColor: Color, weight: Int): Color =
+    if (watermarkColor.alpha == 0)
+        Color(sourceColor.red, sourceColor.green, sourceColor.blue)
+    else { // for alpha = 255
+        Color(
+            (weight * watermarkColor.red + (100 - weight) * sourceColor.red) / 100,
+            (weight * watermarkColor.green + (100 - weight) * sourceColor.green) / 100,
+            (weight * watermarkColor.blue + (100 - weight) * sourceColor.blue) / 100
+        )
+    }
