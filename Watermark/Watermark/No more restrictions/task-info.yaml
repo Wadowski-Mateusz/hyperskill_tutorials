@@ -1079,10 +1079,16 @@ files:
 - name: test/out2.png
   visible: true
   learner_created: true
+- name: src/watermark/Image.kt
+  visible: true
+  learner_created: true
+- name: src/watermark/ColorCalculator.kt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/17149#comment
 status: Solved
 feedback:
   message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
     to continue learning.
-  time: "Tue, 11 Apr 2023 17:59:30 UTC"
+  time: "Tue, 11 Apr 2023 18:04:27 UTC"
 record: -1
