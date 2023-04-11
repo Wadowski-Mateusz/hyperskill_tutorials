@@ -578,7 +578,4 @@ files:
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/17147#comment
 status: Solved
-feedback:
-  message: Congratulations!
-  time: "Tue, 11 Apr 2023 09:36:07 UTC"
-record: -1
+record: 2

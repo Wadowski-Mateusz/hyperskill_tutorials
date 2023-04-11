@@ -1,59 +1,10 @@
 package watermark
 
 import java.awt.Color
-import java.awt.image.BufferedImage
 import java.io.File
-import java.lang.NumberFormatException
 import javax.imageio.ImageIO
+import kotlin.NumberFormatException
 import kotlin.system.exitProcess
-
-
-class Image(val fileName: String, val name: String) {
-    val imageFile: File = File(fileName)
-    val bufferedImage: BufferedImage
-    val width: Int
-    val height: Int
-    val numberOfComponents: Int
-    val numberOfColorComponents: Int
-    val bitsPerPixel: Int
-    val transparency: Int
-
-    init {
-        if(!imageFile.isFile) {
-            println("The file $fileName doesn't exist.")
-            exitProcess(1)
-        }
-        bufferedImage= ImageIO.read(imageFile)
-        width = bufferedImage.width
-        height = bufferedImage.height
-        numberOfComponents = bufferedImage.colorModel.numComponents
-        numberOfColorComponents = bufferedImage.colorModel.numColorComponents
-        bitsPerPixel = bufferedImage.colorModel.pixelSize
-        transparency = bufferedImage.transparency
-        validateImage()
-    }
-
-    fun getTransparencyName(): String = when(this.transparency) {
-            1 -> "OPAQUE"
-            2 -> "BITMASK"
-            3 -> "TRANSLUCENT"
-            else -> {"ILLEGAL TRANSPARENCY ID"}
-    }
-
-    fun isTransparent(): Boolean = transparency == 3
-
-    private fun validateImage() {
-        if (numberOfColorComponents != 3) {
-            println("The number of $name color components isn't 3.")
-            exitProcess(1)
-        }
-        if (bitsPerPixel != 24 && bitsPerPixel != 32) {
-            println("The $name isn't 24 or 32-bit.")
-            exitProcess(1)
-        }
-    }
-}
-
 
 fun main() {
 
@@ -76,11 +27,30 @@ fun main() {
         if(watermarkImage.isTransparent()) {
             println("Do you want to use the watermark's Alpha channel?")
             if (readln().trim().lowercase() == "yes")
-               :: calculateOutputColorTransparent
+               ColorCalculator::calculateOutputColorAlpha
             else
-                ::calculateOutputColor
-        } else
-            ::calculateOutputColor
+                ColorCalculator::calculateOutputColor
+        } else {
+            println("Do you want to set a transparency color?.")
+            if(readln().trim().lowercase() == "yes") {
+                println("Input a transparency color ([Red] [Green] [Blue]):")
+                val transparencyColor: Color =
+                    try {
+                        val transparencyColors = readln().trim().split(" ").map { it.toInt() }
+                        if (transparencyColors.size != 3 || transparencyColors.any { it !in 0..255}) {
+                            println("The transparency color input is invalid.")
+                            exitProcess(1)
+                        }
+                        Color(transparencyColors[0], transparencyColors[1], transparencyColors[2])
+                    } catch (e: NumberFormatException) {
+                        println("The transparency color input is invalid.")
+                        exitProcess(1)
+                    }
+                ColorCalculator.ignoreColor = transparencyColor
+                ColorCalculator::calculateOutputColorIgnoreColor
+            } else
+                ColorCalculator::calculateOutputColor
+        }
 
 
     println("Input the watermark transparency percentage (Integer 0-100):")
@@ -115,26 +85,6 @@ fun main() {
         }
     }
 
-
-
     ImageIO.write(outputImage.bufferedImage, outputFileName.split(".").last(), File(outputFileName))
     println("The watermarked image $outputFileName has been created.")
 }
-
-fun calculateOutputColor(sourceColor: Color, watermarkColor: Color, weight: Int): Color =
-    Color(
-        (weight * watermarkColor.red + (100 - weight) * sourceColor.red) / 100,
-        (weight * watermarkColor.green + (100 - weight) * sourceColor.green) / 100,
-        (weight * watermarkColor.blue + (100 - weight) * sourceColor.blue) / 100
-    )
-
-fun calculateOutputColorTransparent(sourceColor: Color, watermarkColor: Color, weight: Int): Color =
-    if (watermarkColor.alpha == 0)
-        Color(sourceColor.red, sourceColor.green, sourceColor.blue)
-    else { // for alpha = 255
-        Color(
-            (weight * watermarkColor.red + (100 - weight) * sourceColor.red) / 100,
-            (weight * watermarkColor.green + (100 - weight) * sourceColor.green) / 100,
-            (weight * watermarkColor.blue + (100 - weight) * sourceColor.blue) / 100
-        )
-    }
