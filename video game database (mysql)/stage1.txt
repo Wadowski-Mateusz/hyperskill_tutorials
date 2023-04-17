@@ -1,0 +1,59 @@
+game_developers_tb = 
+    "create table game_developers(
+        id int PRIMARY KEY,
+        name varchar,
+        address varchar,
+        state varchar,
+        city varchar,
+        country varchar
+    );"
+
+platforms_tb = 
+    "create table platforms(
+        id int PRIMARY KEY,
+        name varchar,
+        company_id int,
+        company varchar,
+        release_date datetime,
+        original_price decimal(10,2)
+    );"
+
+characters_tb = 
+    "create table characters(
+        id int PRIMARY KEY,
+        name varchar, 
+        birthday datetime, 
+        gender decimal(2,1),
+        info varchar
+    );"
+
+video_games_tb = 
+    "create table video_games(
+        id int PRIMARY KEY,
+        name varchar, 
+        game_genre varchar,
+        game_developer varchar, 
+        release_date date,
+        FOREIGN KEY (game_developer) REFERENCES game_developers(name)
+    );"
+
+
+platforms_games_tb = 
+    "create table platforms_games(
+        game_id int, 
+        platform_id int,
+        platform_name varchar,
+        PRIMARY KEY (game_id, platform_id),
+        FOREIGN KEY (game_id) REFERENCES video_games(id),
+        FOREIGN KEY (platform_id) REFERENCES platforms(id)
+    );"
+
+games_characters_tb = 
+    "create table games_characters(
+        character_id int,
+        character_name varchar, 
+        game_id int,
+        PRIMARY KEY (character_id, game_id),
+        FOREIGN KEY (character_id) REFERENCES characters(id),
+        FOREIGN KEY (game_id) REFERENCES video_games(id)
+    );"

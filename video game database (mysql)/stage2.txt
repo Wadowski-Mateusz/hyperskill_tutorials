@@ -1,0 +1,15 @@
+delete_rows = "
+    delete from games_characters
+    where character_id is null
+    ;"
+
+
+alter_table_platforms = "
+    update platforms
+    set release_date = DATE()
+    ;"
+
+alter_table_characters = "
+    update characters
+    set birthday = DATE()
+    ;"
