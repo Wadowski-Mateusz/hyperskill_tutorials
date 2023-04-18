@@ -1,0 +1,30 @@
+    Count how many games in the database were made in California;
+
+    Discover the state with more games released on the database and, in this state, find the full address (street, city, state, country) of the lastest developer company to release a game.
+
+
+count_games_ca = "
+    select count(*)
+    from video_games as vg
+    left join game_developers gd
+    on vg.game_developer = gd.name
+    where gd.state = 'California'
+;"
+
+address = "
+    select gd.address, gd.city, gd.state, gd.country
+    from game_developers as gd
+    left join video_games as vg on vg.game_developer = gd.name
+    where state = (
+        select gd.state
+        from video_games as vg
+        left join game_developers gd
+        on vg.game_developer = gd.name
+        where gd.state is not null
+        group by gd.state
+        order by count(*) desc
+        limit 1
+    )
+    order by vg.release_date desc
+    limit 1
+"

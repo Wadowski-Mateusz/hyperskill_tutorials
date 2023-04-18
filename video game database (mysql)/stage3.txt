@@ -1,0 +1,28 @@
+search_nathan = "
+    select * 
+    from characters 
+    where name = 'Nathan Drake'
+;"
+
+how_many_people = "
+    select count (*) 
+    from characters 
+    where info like '%Nathan Drake%'
+;"
+    
+
+That's a big boy
+
+find_location = "
+    select address, state, city, country 
+    from game_developers 
+    where name = (
+        select game_developer 
+        from video_games 
+        where id = (
+            select game_id
+            from games_characters
+            where character_name = 'Nathan Drake'
+        )
+    )
+;"
