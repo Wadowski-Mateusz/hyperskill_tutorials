@@ -112,21 +112,6 @@ files:
         implementation 'org.springframework.boot:spring-boot-starter-web'
     }
   learner_created: false
-- name: src/cinema/Seat.kt
-  visible: true
-  learner_created: true
-- name: src/cinema/Room.kt
-  visible: true
-  learner_created: true
-- name: src/cinema/controllers/RoomController.kt
-  visible: true
-  learner_created: true
-feedback_link: https://hyperskill.org/learn/step/20457#comment
-status: Failed
-feedback:
-  message: |-
-    Error in test #1
-
-    No class found with annotation org.springframework.boot.autoconfigure.SpringBootApplication
-  time: "Mon, 10 Apr 2023 21:35:27 UTC"
-record: -1
+feedback_link: https://hyperskill.org/projects/263/stages/1331/implement#comment
+status: Solved
+record: 1

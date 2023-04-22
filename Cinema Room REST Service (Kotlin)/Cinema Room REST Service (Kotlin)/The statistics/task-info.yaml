@@ -47,10 +47,56 @@ files:
 
     sourceSets.main.resources.srcDirs = ["src/resources"]
 
+
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter'
         implementation 'org.springframework.boot:spring-boot-starter-actuator'
         implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+  learner_created: false
+- name: src/cinema/Seat.kt
+  visible: true
+  text: |-
+    package cinema
+
+    class Seat(val row: Int, val column: Int) {
+
+    }
+  learner_created: false
+- name: src/cinema/Room.kt
+  visible: true
+  text: |-
+    package cinema
+
+    class Room(val total_rows: Int, val total_columns: Int) {
+    //    val total_rows: Int = 3
+    //    val total_columns: Int = 2
+
+        val available_seats: List<Seat> = buildList {
+            for (row in 1..total_rows)
+                for (column in 1..total_columns)
+                    add(Seat(row, column))
+        }
+
+    }
+  learner_created: false
+- name: src/cinema/controllers/RoomController.kt
+  visible: true
+  text: |-
+    package cinema.controllers
+
+    import cinema.Room
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.RestController
+
+    @RestController
+    class RoomController {
+
+        @GetMapping("/seats")
+        fun getRoom(): Room {
+            return Room(9, 9)
+        }
+
     }
   learner_created: false
 - name: test/CinemaTests.java
@@ -392,6 +438,6 @@ files:
         };
     }
   learner_created: false
-feedback_link: https://hyperskill.org/learn/step/20460#comment
+feedback_link: https://hyperskill.org/projects/263/stages/1334/implement#comment
 status: Unchecked
 record: -1

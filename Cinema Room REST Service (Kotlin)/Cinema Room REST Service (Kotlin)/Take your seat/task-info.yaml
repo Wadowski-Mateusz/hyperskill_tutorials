@@ -47,6 +47,7 @@ files:
 
     sourceSets.main.resources.srcDirs = ["src/resources"]
 
+
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter'
         implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -225,6 +226,25 @@ files:
         };
     }
   learner_created: false
-feedback_link: https://hyperskill.org/learn/step/20458#comment
-status: Unchecked
+- name: src/cinema/entity/Seat.kt
+  visible: true
+  learner_created: true
+- name: src/cinema/controler/RoomController.kt
+  visible: true
+  learner_created: true
+- name: src/cinema/entity/Room.kt
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/projects/263/stages/1332/implement#comment
+status: Failed
+feedback:
+  message: |-
+    Wrong answer in test #1
+
+    GET /seats should respond with status code 200, responded: 404
+
+    Response body:
+
+    {&quot;timestamp&quot;:&quot;2023-04-22T20:32:17.466+00:00&quot;,&quot;status&quot;:404,&quot;error&quot;:&quot;Not Found&quot;,&quot;path&quot;:&quot;/seats&quot;}
+  time: "Sat, 22 Apr 2023 20:32:17 UTC"
 record: -1
