@@ -113,21 +113,15 @@ files:
 - name: src/cinema/Models/Seat.java
   visible: true
   learner_created: true
-- name: src/cinema/DTOs/SeatDTO.java
-  visible: true
-  learner_created: true
-- name: src/cinema/Repositories/SeatRepository.java
-  visible: true
-  learner_created: true
 - name: src/cinema/Controllers/SeatController.java
   visible: true
   learner_created: true
 - name: src/cinema/DTOs/RoomDTO.java
   visible: true
   learner_created: true
-feedback_link: https://hyperskill.org/projects/189/stages/945/implement#comment
+feedback_link: https://hyperskill.org/learn/step/13375#comment
 status: Solved
 feedback:
   message: Congratulations!
   time: "Fri, 14 Apr 2023 16:26:16 UTC"
-record: -1
+record: 1
