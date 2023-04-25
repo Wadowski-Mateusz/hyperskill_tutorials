@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/539847/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Sun, 23 Apr 2023 06:41:05 UTC"
+update_date: "Tue, 25 Apr 2023 08:07:50 UTC"
 stages:
 - id: 945
   step: 13375
@@ -13,7 +13,7 @@ stages:
   is_completed: true
 - id: 947
   step: 13377
-  is_completed: false
+  is_completed: true
 - id: 948
   step: 13378
   is_completed: false
@@ -51,6 +51,8 @@ topics:
     theory_id: 16927
   - title: HTTP URL
     theory_id: 6740
+  - title: The concept of patterns
+    theory_id: 3611
   - title: Basic project structure
     theory_id: 6339
   - title: IoC Container
@@ -69,14 +71,12 @@ topics:
     theory_id: 19550
   - title: Logging in Spring Boot
     theory_id: 27485
-  - title: The concept of patterns
-    theory_id: 3611
+  - title: Introduction to Spring Web MVC
+    theory_id: 13611
   - title: HTTP messages
     theory_id: 6752
   - title: REST
     theory_id: 7834
-  - title: Introduction to Spring Web MVC
-    theory_id: 13611
   - title: Introduction to Spring Data
     theory_id: 16299
   - title: CRUD repositories
@@ -227,16 +227,16 @@ topics:
     theory_id: 9640
   - title: YAML
     theory_id: 12722
-  - title: XML
-    theory_id: 6901
   - title: Introduction to software architecture
     theory_id: 15368
-  - title: Design principles
-    theory_id: 8956
+  - title: XML
+    theory_id: 6901
   - title: JSON
     theory_id: 6854
   - title: Data and object mapping
     theory_id: 8262
+  - title: Design principles
+    theory_id: 8956
   - title: Jackson
     theory_id: 21027
   - title: Coupling and cohesion

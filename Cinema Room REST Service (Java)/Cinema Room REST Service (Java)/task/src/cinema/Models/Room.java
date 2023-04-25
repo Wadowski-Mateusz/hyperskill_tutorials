@@ -2,6 +2,7 @@ package cinema.Models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 public class Room {
@@ -21,7 +22,8 @@ public class Room {
         for (int row = 1; row <= totalRows; row++) {
             int price = (row > 4 ? 8 : 10);
             for (int column = 1; column <= totalColumns; column++)
-                seats.add(new Seat(row, column, price, false));
+                seats.add(new Seat(row, column, price));
+//                seats.add(new Seat(row, column, price, false));
         }
     }
 
@@ -47,11 +49,18 @@ public class Room {
     }
 
     public Boolean isSeatTaken(int row, int column) {
-        return seats.get(row*totalColumns + column).isTaken();
+        return seats.get(row*totalColumns + column).getToken() != null;
+//        return seats.get(row*totalColumns + column).isTaken();
     }
 
     public void takeSeat(int row, int column) {
-        seats.get(row * totalColumns + column).setTaken(true);
+        seats.get(row * totalColumns + column).setToken(UUID.randomUUID());
+//        seats.get(row * totalColumns + column).setTaken(true);
+    }
+
+    public void freeSeat(int row, int column) {
+        seats.get(row * totalColumns + column).setToken(null);
+//        seats.get(row * totalColumns + column).setTaken(true);
     }
 
 

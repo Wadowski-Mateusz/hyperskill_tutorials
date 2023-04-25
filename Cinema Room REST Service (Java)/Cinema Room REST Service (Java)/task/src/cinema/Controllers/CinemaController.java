@@ -1,8 +1,6 @@
 package cinema.Controllers;
 
-import cinema.DTOs.PositionDTO;
-import cinema.DTOs.RoomDTO;
-import cinema.DTOs.SeatDTO;
+import cinema.DTOs.*;
 import cinema.Models.Room;
 import cinema.Models.Seat;
 import org.springframework.http.HttpStatus;
@@ -12,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 
 @RestController
 public class CinemaController {
@@ -40,7 +39,7 @@ public class CinemaController {
     }
 
     @PostMapping("/purchase")
-    public ResponseEntity<?> purchaseSeat(@RequestBody PositionDTO positionDTO) {
+    public ResponseEntity<?> purchaseTicket(@RequestBody PositionDTO positionDTO) {
 
         int row = positionDTO.row() - 1;
         int column = positionDTO.column() - 1;
@@ -57,11 +56,34 @@ public class CinemaController {
         }
 
         room.takeSeat(row, column);
-        return ResponseEntity.ok( seatToDTO(room.getSeat(row, column)) );
+        TicketDTO ticketDTO = seatToTicketDTO(room.getSeat(row, column));
+        return ResponseEntity.ok(ticketDTO);
+    }
+
+    @PostMapping("/return")
+    public ResponseEntity<?> returnTicket(@RequestBody ReturnTokenDTO token) {
+        Seat seat = room.getSeats().stream()
+                .filter(s -> s.getToken() != null)
+                .filter(s -> s.getToken().equals(token.token()))
+                .findFirst()
+                .orElse(null);
+
+        if (seat == null) {
+            Map<String, String> m = Map.of("error", "Wrong token!");
+            return new ResponseEntity<>(m, HttpStatus.BAD_REQUEST);
+        }
+
+        seat.setToken(null);
+        return ResponseEntity.ok(new ReturnedTicketDTO(seatToDTO(seat)));
+//        return ResponseEntity.ok("inside endpoint");
     }
 
     private SeatDTO seatToDTO(Seat seat) {
         return new SeatDTO(seat.getRow(), seat.getColumn(), seat.getPrice());
+    }
+
+    private TicketDTO seatToTicketDTO(Seat seat) {
+        return new TicketDTO(seat.getToken(), seatToDTO(seat));
     }
 
     private RoomDTO roomToDTO(Room room) {

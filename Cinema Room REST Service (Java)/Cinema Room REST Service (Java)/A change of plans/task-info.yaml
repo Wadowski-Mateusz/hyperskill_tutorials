@@ -297,6 +297,253 @@ files:
         };
     }
   learner_created: false
+- name: src/cinema/Models/Room.java
+  visible: true
+  text: |
+    package cinema.Models;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+
+    public class Room {
+
+        private final int totalRows;
+        private final int totalColumns;
+        private final List<Seat> seats = new ArrayList<>();
+
+        public Room() {
+            totalColumns = 0;
+            totalRows = 0;
+        }
+
+        public Room(int totalRows, int totalColumns) {
+            this.totalRows = totalRows;
+            this.totalColumns = totalColumns;
+            for (int row = 1; row <= totalRows; row++) {
+                int price = (row > 4 ? 8 : 10);
+                for (int column = 1; column <= totalColumns; column++)
+                    seats.add(new Seat(row, column, price, false));
+            }
+        }
+
+        public int getTotalRows() {
+            return totalRows;
+        }
+
+        public int getTotalColumns() {
+            return totalColumns;
+        }
+
+        public List<Seat> getSeats() {
+            return seats;
+        }
+
+        public Seat getSeat(int row, int column) {
+            return seats.get(row * totalColumns + column);
+        }
+
+        // index = (seat.row - 1) * this.totalColumns + seat.column - 1
+        public Seat getSeat(int index) {
+            return seats.get(index);
+        }
+
+        public Boolean isSeatTaken(int row, int column) {
+            return seats.get(row*totalColumns + column).isTaken();
+        }
+
+        public void takeSeat(int row, int column) {
+            seats.get(row * totalColumns + column).setTaken(true);
+        }
+
+
+    }
+  learner_created: true
+- name: src/cinema/Exceptions/SeatDoesNotExist.java
+  visible: true
+  text: |
+    package cinema.Exceptions;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public class SeatDoesNotExist extends RuntimeException{
+        public SeatDoesNotExist(String msg) {
+            super(msg);
+        }
+    }
+  learner_created: true
+- name: src/cinema/DTOs/SeatDTO.java
+  visible: true
+  text: |
+    package cinema.DTOs;
+
+    public record SeatDTO (int row, int column, int price) { }
+  learner_created: true
+- name: src/cinema/Controllers/CinemaController.java
+  visible: true
+  text: |
+    package cinema.Controllers;
+
+    import cinema.DTOs.PositionDTO;
+    import cinema.DTOs.RoomDTO;
+    import cinema.DTOs.SeatDTO;
+    import cinema.Models.Room;
+    import cinema.Models.Seat;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.annotation.*;
+
+    import java.util.LinkedList;
+    import java.util.List;
+    import java.util.Map;
+
+    @RestController
+    public class CinemaController {
+
+        private final Room room;
+
+        public CinemaController() {
+            final int total_rows = 9;
+            final int total_columns = 9;
+            this.room = new Room(total_rows, total_columns);
+        }
+
+        @GetMapping("/seats")
+        public RoomDTO getSeats() {
+            return roomToDTO(room);
+        }
+
+        @GetMapping("/seats2")
+        public Room getSeats2() {
+            return room;
+        }
+
+        @GetMapping("/seat/{id}")
+        public Seat getSeat(@PathVariable int id) {
+            return room.getSeat(id);
+        }
+
+        @PostMapping("/purchase")
+        public ResponseEntity<?> purchaseSeat(@RequestBody PositionDTO positionDTO) {
+
+            int row = positionDTO.row() - 1;
+            int column = positionDTO.column() - 1;
+
+            if (row >= room.getTotalRows() || column >= room.getTotalColumns()
+                    || column < 0 || row < 0) {
+                Map<String, String> m = Map.of("error", "The number of a row or a column is out of bounds!");
+                return new ResponseEntity<>(m, HttpStatus.BAD_REQUEST);
+            }
+
+            if (room.isSeatTaken(row, column)) {
+                Map<String, String> m = Map.of("error", "The ticket has been already purchased!");
+                return new ResponseEntity<>(m, HttpStatus.BAD_REQUEST);
+            }
+
+            room.takeSeat(row, column);
+            return ResponseEntity.ok( seatToDTO(room.getSeat(row, column)) );
+        }
+
+        private SeatDTO seatToDTO(Seat seat) {
+            return new SeatDTO(seat.getRow(), seat.getColumn(), seat.getPrice());
+        }
+
+        private RoomDTO roomToDTO(Room room) {
+            List<SeatDTO> seatsDTO = new LinkedList<>();
+            for(int i = 0; i < room.getTotalColumns() * room.getTotalRows(); i++)
+                seatsDTO.add(seatToDTO(room.getSeat(i)));
+            return new RoomDTO(room.getTotalRows(), room.getTotalColumns(), seatsDTO);
+        }
+
+    }
+  learner_created: true
+- name: src/cinema/Models/Seat.java
+  visible: true
+  text: |
+    package cinema.Models;
+
+    import java.util.Objects;
+
+    public final class Seat {
+        private final int row;
+        private final int column;
+        private final int price;
+        private boolean isTaken;
+
+        public Seat(int row, int column, int price, boolean isTaken) {
+            this.row = row;
+            this.column = column;
+            this.price = price;
+            this.isTaken = isTaken;
+        }
+
+        public int getRow() {
+            return row;
+        }
+
+        public int getColumn() {
+            return column;
+        }
+
+        public int getPrice() {
+            return price;
+        }
+
+        public boolean isTaken() {
+            return isTaken;
+        }
+
+        public void setTaken(boolean taken) {
+            isTaken = taken;
+        }
+    }
+  learner_created: true
+- name: src/cinema/DTOs/PositionDTO.java
+  visible: true
+  text: |
+    package cinema.DTOs;
+
+    public record PositionDTO(Integer row, Integer column) {
+    }
+  learner_created: true
+- name: src/cinema/Exceptions/SeatAlreadyTakenException.java
+  visible: true
+  text: |
+    package cinema.Exceptions;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public class SeatAlreadyTakenException extends RuntimeException{
+        public SeatAlreadyTakenException(String msg) {
+            super(msg);
+        }
+    }
+  learner_created: true
+- name: src/cinema/DTOs/RoomDTO.java
+  visible: true
+  text: |
+    package cinema.DTOs;
+
+    import java.util.List;
+
+    public record RoomDTO (int total_rows, int total_columns, List<SeatDTO> available_seats) { }
+  learner_created: true
+- name: src/cinema/DTOs/TicketDTO.java
+  visible: true
+  learner_created: true
+- name: src/cinema/Models/Ticket.java
+  visible: true
+  learner_created: true
+- name: src/cinema/DTOs/ReturnTokenDTO.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13377#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Tue, 25 Apr 2023 09:30:57 UTC"
 record: -1
