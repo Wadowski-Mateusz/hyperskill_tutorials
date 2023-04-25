@@ -7,14 +7,12 @@ public final class Seat {
     private final int row;
     private final int column;
     private final int price;
-//    private boolean isTaken;
     private UUID token;
 
-    public Seat(int row, int column, int price/*, boolean isTaken*/) {
+    public Seat(int row, int column, int price) {
         this.row = row;
         this.column = column;
         this.price = price;
-//        this.isTaken = isTaken;
     }
     public UUID getToken() {
         return token;
@@ -36,11 +34,4 @@ public final class Seat {
         return price;
     }
 
-//    public boolean isTaken() {
-//        return isTaken;
-//    }
-
-//    public void setTaken(boolean taken) {
-//        isTaken = taken;
-//    }
 }

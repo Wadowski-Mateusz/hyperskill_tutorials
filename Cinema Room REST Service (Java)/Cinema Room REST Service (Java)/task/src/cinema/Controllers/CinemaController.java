@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.LoginContext;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -44,8 +46,9 @@ public class CinemaController {
         int row = positionDTO.row() - 1;
         int column = positionDTO.column() - 1;
 
-        if (row >= room.getTotalRows() || column >= room.getTotalColumns()
-                || column < 0 || row < 0) {
+
+        if( !(0 <= row && row < room.getTotalRows())
+                || !(0 <= column && column < room.getTotalColumns())) {
             Map<String, String> m = Map.of("error", "The number of a row or a column is out of bounds!");
             return new ResponseEntity<>(m, HttpStatus.BAD_REQUEST);
         }
@@ -75,7 +78,27 @@ public class CinemaController {
 
         seat.setToken(null);
         return ResponseEntity.ok(new ReturnedTicketDTO(seatToDTO(seat)));
-//        return ResponseEntity.ok("inside endpoint");
+    }
+
+
+    @PostMapping("/stats")
+    public ResponseEntity<?> stats(@RequestParam(required = false) String password) {
+        if (!"super_secret".equals(password)) {
+            Map<String, String> m = Map.of("error", "The password is wrong!");
+            return new ResponseEntity<>(m, HttpStatus.UNAUTHORIZED);
+        } else {
+            int income = room.getSeats().stream()
+                    .filter(s -> s.getToken() != null)
+                    .collect(Collectors.summingInt(Seat::getPrice));
+
+            int soldTickets = (int) room.getSeats().stream()
+                    .filter(s -> s.getToken() != null)
+                    .count();
+
+            int availableSeats = room.getSeats().size() - soldTickets;
+
+            return ResponseEntity.ok(new StatsDTO(income, availableSeats, soldTickets));
+        }
     }
 
     private SeatDTO seatToDTO(Seat seat) {
