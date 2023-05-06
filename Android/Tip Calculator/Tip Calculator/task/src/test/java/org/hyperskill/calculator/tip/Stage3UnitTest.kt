@@ -12,10 +12,10 @@ import org.robolectric.RobolectricTestRunner
 // Version 2.0
 @RunWith(RobolectricTestRunner::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.java) {
+class Stage3UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.java) {
 
     companion object {
-        const val expectedTextTemplate = "Bill value: %.2f$, tip percentage: %d%%"
+        const val expectedTextTemplate = "Tip amount: %.2f$"
     }
 
     @Test
@@ -46,7 +46,8 @@ class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.j
             val tipToTest = 0
 
             val messageTextError = "View with id \"$idTextView\" should contain formatted output"
-            val expectedText = expectedTextTemplate.format(valueToTest.toDouble(), tipToTest)
+            val expectedValue = 0.00
+            val expectedText = expectedTextTemplate.format(expectedValue, tipToTest)
             val actualText = textView.text.toString()
             assertEquals(messageTextError, expectedText, actualText)
         }
@@ -67,7 +68,8 @@ class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.j
             advanceClockAndRun()
 
             val messageTextError = "View with id \"$idTextView\" should contain formatted output"
-            val expectedText = expectedTextTemplate.format(valueToTest.toDouble(), tipToTest)
+            val expectedValue = 20.10
+            val expectedText = expectedTextTemplate.format(expectedValue, tipToTest)
             val actualText = textView.text
             assertEquals(messageTextError, expectedText, actualText)
         }
@@ -88,7 +90,8 @@ class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.j
             advanceClockAndRun()
 
             val messageTextError = "View with id \"$idTextView\" should contain formatted output"
-            val expectedText = expectedTextTemplate.format(valueToTest.toDouble(), tipToTest)
+            val expectedValue = 35.10
+            val expectedText = expectedTextTemplate.format(expectedValue, tipToTest)
             val actualText = textView.text.toString()
             assertEquals(messageTextError, expectedText, actualText)
         }
@@ -110,7 +113,8 @@ class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.j
                 advanceClockAndRun()
 
 
-                val expectedText = expectedTextTemplate.format(valueToTest.toDouble(), tipToTest)
+                val expectedValue = 90_000_000_000_000_000.00
+                val expectedText = expectedTextTemplate.format(expectedValue, tipToTest)
                 val actualText = textView.text.toString()
                 assertEquals(messageLargeNumberTextError, expectedText, actualText)
             } catch (ex: Exception) {
@@ -128,11 +132,14 @@ class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.j
             val valueToTest = "70.12"
             editText.setText(valueToTest)
             advanceClockAndRun()
-            val tipToTest = 0
+            val tipToTest = 10
+            slider.value = tipToTest.toFloat()
+            advanceClockAndRun()
 
             val messageDecimalNumberTextError =
                 "Make sure you give support for numbers with decimal part"
-            val expectedText = expectedTextTemplate.format(valueToTest.toDouble(), tipToTest)
+            val expectedValue = 7.01
+            val expectedText = expectedTextTemplate.format(expectedValue, tipToTest)
             val actualText = textView.text.toString()
             assertEquals(messageDecimalNumberTextError, expectedText, actualText)
         }
@@ -159,6 +166,30 @@ class Stage2UnitTest : TipCalculatorUnitTest<MainActivity>(MainActivity::class.j
             val expectedText = ""
             val actualText = textView.text.toString()
             assertEquals(messageDecimalNumberTextError, expectedText, actualText)
+        }
+    }
+
+    @Test
+    fun test07_check101TipsForValue100() {
+        testActivity {
+            editText
+            textView
+
+            val valueToTest = "100.00"
+            editText.setText(valueToTest)
+            advanceClockAndRun()
+
+            (0..100).forEach { tipToTest ->
+                slider.value = tipToTest.toFloat()
+                advanceClockAndRun()
+
+                val messageLongNumberTextError =
+                    "Make sure you give support for all 101 possible tip values. With tip value $tipToTest"
+                val expectedValue = tipToTest.toDouble()
+                val expectedText = expectedTextTemplate.format(expectedValue, tipToTest)
+                val actualText = textView.text.toString()
+                assertEquals(messageLongNumberTextError, expectedText, actualText)
+            }
         }
     }
 }

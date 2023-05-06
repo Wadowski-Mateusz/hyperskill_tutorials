@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun update(textView: TextView, bill: Double, tip: Int) {
         if(bill != 0.0)
-            textView.text = "Bill value: ${String.format("%.2f", bill)}$, tip percentage: $tip%"
+            textView.text = "Tip amount: ${String.format("%.2f", (bill*tip/100.0))}$"
         else
             textView.text = ""
 
