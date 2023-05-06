@@ -634,6 +634,9 @@ files:
     \      assertEquals(messageWrongInputFormat, diaryTextBeforeSaveBlank, diaryTextAfterSaveBlank)\n\
     \        }\n    }\n}"
   learner_created: false
-feedback_link: https://hyperskill.org/projects/276/stages/1399/implement#comment
-status: Unchecked
+feedback_link: https://hyperskill.org/learn/step/21700#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 06 May 2023 19:51:30 UTC"
 record: -1
