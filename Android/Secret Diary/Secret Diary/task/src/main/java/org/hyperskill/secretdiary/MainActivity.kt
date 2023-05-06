@@ -24,28 +24,18 @@ class MainActivity : AppCompatActivity() {
 
         save.setOnClickListener {
             if(input.text.isNotEmpty() && input.text.isNotBlank()) {
-//                val dateTime: Instant = Clock.System.now()
                 val dateTime: Long = Clock.System.now().toEpochMilliseconds()
-
-                val timeZone: TimeZone = TimeZone.currentSystemDefault() // should do nothing
-//                val local: LocalDateTime = dateTime.toLocalDateTime(timeZone)
                 val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(dateTime).toString()
-//                val timeStamp = String.format("%04d-%02d-%02d %02d:%02d:%02d",
-//                        local.year, local.monthNumber, local.dayOfMonth,
-//                        local.hour, local.minute, local.second)
                 if(textView.text.isNotEmpty())
                     textView.text = "${timeStamp}\n${input.text}\n\n${textView.text}"
                 else
                     textView.text = "${timeStamp}\n${input.text}"
-
                 input.text.clear()
             } else Toast.makeText(
                 applicationContext,
                 "Empty or blank input cannot be saved",
                 Toast.LENGTH_SHORT)
                 .show()
-
-
         }
 
 
