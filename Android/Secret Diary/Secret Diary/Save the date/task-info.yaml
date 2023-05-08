@@ -634,12 +634,9 @@ files:
     \      assertEquals(messageWrongInputFormat, diaryTextBeforeSaveBlank, diaryTextAfterSaveBlank)\n\
     \        }\n    }\n}"
   learner_created: false
-- name: src/test/java/org/hyperskill/secretdiary/Stage1UnitTest.kt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/21700#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: "Sat, 06 May 2023 20:35:16 UTC"
-record: -1
+  time: "Sat, 06 May 2023 20:38:14 UTC"
+record: 2
