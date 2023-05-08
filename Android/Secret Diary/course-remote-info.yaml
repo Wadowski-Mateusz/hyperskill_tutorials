@@ -4,7 +4,7 @@ hyperskill_project:
   is_template_based: false
   use_ide: true
   environment: android
-update_date: "Mon, 08 May 2023 09:09:40 UTC"
+update_date: "Mon, 08 May 2023 15:13:16 UTC"
 stages:
 - id: 1398
   step: 21699
@@ -20,7 +20,7 @@ stages:
   is_completed: true
 - id: 1402
   step: 21703
-  is_completed: false
+  is_completed: true
 topics:
   0:
   - title: Binary numbers
