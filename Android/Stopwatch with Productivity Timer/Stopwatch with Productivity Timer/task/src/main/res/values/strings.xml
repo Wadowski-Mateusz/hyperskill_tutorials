@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Stopwatch with Productivity Timer</string>
+    <string name="settings_ok">OK</string>
+    <string name="settings_cancel">Cancel</string>
 </resources>

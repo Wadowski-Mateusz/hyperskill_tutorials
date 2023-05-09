@@ -1436,6 +1436,58 @@ files:
     }
 
   learner_created: false
+- name: src/main/res/drawable/my_progress_bar.xml
+  visible: true
+  text: |-
+    <?xml version="1.0" encoding="utf-8"?>
+    <!--rotate_drawable.xml-->
+
+    <rotate xmlns:android="http://schemas.android.com/apk/res/android"
+        android:fromDegrees="0"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toDegrees="360">
+        <shape
+            android:innerRadiusRatio="4"
+            android:shape="ring"
+            android:thicknessRatio="5.333"
+            android:useLevel="false">
+            <size
+                android:width="64dp"
+                android:height="64dp" />
+
+            <gradient
+                android:centerColor="#880800FF"
+                android:centerY="50%"
+                android:endColor="#ff0800FF"
+                android:startColor="#000800FF"
+                android:type="sweep"
+                />
+        </shape>
+    </rotate>
+  learner_created: true
+- name: src/main/res/layout/settings_alert.xml
+  visible: true
+  text: |
+    <?xml version="1.0" encoding="utf-8"?>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <EditText
+            android:id="@+id/upperLimitEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            />
+
+    </FrameLayout>
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/27390#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Tue, 09 May 2023 18:30:06 UTC"
 record: -1
