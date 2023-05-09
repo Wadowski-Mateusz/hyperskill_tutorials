@@ -997,6 +997,12 @@ files:
         }
     }
   learner_created: false
-feedback_link: https://hyperskill.org/projects/72/stages/396/implement#comment
-status: Unchecked
+- name: src/main/res/drawable/my_progress_bar.xml
+  visible: true
+  learner_created: true
+feedback_link: https://hyperskill.org/learn/step/27388#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Tue, 09 May 2023 12:52:37 UTC"
 record: -1
