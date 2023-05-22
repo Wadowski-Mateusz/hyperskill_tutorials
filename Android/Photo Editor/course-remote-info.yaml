@@ -4,14 +4,14 @@ hyperskill_project:
   is_template_based: false
   use_ide: true
   environment: android
-update_date: "Sat, 13 May 2023 20:30:36 UTC"
+update_date: "Mon, 22 May 2023 19:28:51 UTC"
 stages:
 - id: 1206
   step: 18740
   is_completed: true
 - id: 1207
   step: 18741
-  is_completed: false
+  is_completed: true
 - id: 1208
   step: 18742
   is_completed: false
@@ -236,6 +236,14 @@ topics:
     theory_id: 20084
   - title: Data structures
     theory_id: 16927
+  - title: Pseudocode
+    theory_id: 15090
+  - title: Pseudocode basics
+    theory_id: 19510
+  - title: Complex constructions in pseudocode
+    theory_id: 20922
+  - title: Stack
+    theory_id: 5252
   - title: SQLite
     theory_id: 14227
   - title: Permissions
@@ -248,14 +256,6 @@ topics:
     theory_id: 9689
   - title: While loops
     theory_id: 4659
-  - title: Pseudocode
-    theory_id: 15090
-  - title: Pseudocode basics
-    theory_id: 19510
-  - title: Complex constructions in pseudocode
-    theory_id: 20922
-  - title: Stack
-    theory_id: 5252
   - title: Call stack
     theory_id: 11550
   - title: Scopes

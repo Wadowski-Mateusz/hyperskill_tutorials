@@ -6,27 +6,49 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.provider.MediaStore
-import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toBitmap
+import org.hyperskill.photoeditor.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var currentImage: ImageView
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var originalImage: Bitmap
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         bindViews()
 
         //do not change this line
         currentImage.setImageBitmap(createBitmap())
+        originalImage = currentImage.drawable.toBitmap()
+            .copy(Bitmap.Config.ARGB_8888, true)
 
-        val btnGallery = findViewById<Button>(R.id.btnGallery)
-        btnGallery.setOnClickListener {
+        binding.btnGallery.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             activityResultLauncher.launch(intent)
+        }
+
+        binding.slBrightness.addOnChangeListener { _, value, _ ->
+            val copyImage = originalImage.copy(Bitmap.Config.ARGB_8888, true)
+            val width = originalImage.width
+            val height = originalImage.height
+            val pixels = IntArray(width * height)
+            copyImage.getPixels(pixels, 0, width, 0, 0, width, height)
+            for (i in pixels.indices) {
+                val pixel = pixels[i]
+                val red = (Color.red(pixel) + value).coerceIn(0f, 255f).toInt()
+                val green = (Color.green(pixel) + value).coerceIn(0f, 255f).toInt()
+                val blue = (Color.blue(pixel) + value).coerceIn(0f, 255f).toInt()
+                pixels[i] = Color.rgb(red, green, blue)
+            }
+            copyImage.setPixels(pixels, 0, width, 0, 0, width, height)
+            currentImage.setImageBitmap(copyImage)
         }
     }
 
@@ -34,12 +56,14 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val photoUri = result.data?.data ?: return@registerForActivityResult
-                findViewById<ImageView>(R.id.ivPhoto).setImageURI(photoUri)
+                binding.ivPhoto.setImageURI(photoUri)
+                originalImage = binding.ivPhoto.drawable.toBitmap()
+                    .copy(Bitmap.Config.ARGB_8888, true)
             }
         }
 
     private fun bindViews() {
-        currentImage = findViewById(R.id.ivPhoto)
+        currentImage = binding.ivPhoto
     }
 
     // do not change this function
